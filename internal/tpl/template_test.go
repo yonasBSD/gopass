@@ -10,10 +10,6 @@ import (
 	"github.com/gopasspw/gopass/internal/pwschemes/argon2id"
 	"github.com/gopasspw/gopass/pkg/gopass"
 	"github.com/gopasspw/gopass/pkg/gopass/secrets/secparse"
-	"github.com/jsimonetti/pwscheme/md5crypt"
-	"github.com/jsimonetti/pwscheme/ssha"
-	"github.com/jsimonetti/pwscheme/ssha256"
-	"github.com/jsimonetti/pwscheme/ssha512"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -22,16 +18,9 @@ func Example() { //nolint:testableexamples
 	ctx := context.Background()
 	tpl := `Password-value of existing entry: {{ getpw "foo" }}
 Password-value of the new entry: {{ .Content }}
-Md5sum of the new password: {{ .Content | md5sum }}
-Sha1sum of the new password: {{ .Content | sha1sum }}
-Blake3 of the new password: {{ .Content | blake3 }}
-Md5crypt of the new password: {{ .Content | md5crypt }}
-SSHA of the new password: {{ .Content | ssha }}
-SSHA256 of the new password: {{ .Content | ssha256 }}
-SSHA512 of the new password: {{ .Content | ssha512 }}
+Blake3sum of the new password: {{ .Content | blake3sum }}
 Argon2i of the new password: {{ .Content | argon2i }}
 Argon2id of the new password: {{ .Content | argon2id }}
-Bcrypt of the new password: {{ .Content | bcrypt }}
 `
 	kv := kvMock{}
 
@@ -96,18 +85,6 @@ func TestVars(t *testing.T) {
 			Output:   "foobar",
 		},
 		{
-			Template: "{{.Content | md5sum}}",
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			Output:   "3858f62230ac3c915f300c664312c63f",
-		},
-		{
-			Template: "{{.Content | sha1sum}}",
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			Output:   "8843d7f92416211de9ebb963ff4ce28125932878",
-		},
-		{
 			Template: `{{getpw "testdir"}}`,
 			Name:     "testdir",
 			Content:  []byte("foobar"),
@@ -145,143 +122,11 @@ func TestVars(t *testing.T) {
 			Output:   "[barvalue]",
 		},
 		{
-			Template: `md5{{(print .Content .Name) | md5sum}}`,
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			Output:   "md55d952fb5e2b5c6258b044a663518349f",
-		},
-		{
 			Template:   `{{|}}`,
 			Name:       "testdir",
 			Content:    []byte("foobar"),
 			Output:     "",
 			ShouldFail: true,
-		},
-		{
-			Template: "{{.Content | ssha \"12\"}}",
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			OutputFunc: func(s string) error {
-				if !strings.HasPrefix(s, "{SSHA}") {
-					return fmt.Errorf("wrong prefix")
-				}
-
-				ok, err := ssha.Validate("foobar", s)
-				if err != nil {
-					return fmt.Errorf("can't validate: %w", err)
-				}
-
-				if !ok {
-					return fmt.Errorf("hash mismatch")
-				}
-
-				return nil
-			},
-		},
-		{
-			Template: "{{.Content | ssha256 \"12\"}}",
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			OutputFunc: func(s string) error {
-				if !strings.HasPrefix(s, "{SSHA256}") {
-					return fmt.Errorf("wrong prefix: %s", s)
-				}
-
-				ok, err := ssha256.Validate("foobar", s)
-				if err != nil {
-					return fmt.Errorf("can't validate: %w", err)
-				}
-
-				if !ok {
-					return fmt.Errorf("hash mismatch")
-				}
-
-				return nil
-			},
-		},
-		{
-			Template: "{{.Content | ssha512 \"12\"}}",
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			OutputFunc: func(s string) error {
-				if !strings.HasPrefix(s, "{SSHA512}") {
-					return fmt.Errorf("wrong prefix: %s", s)
-				}
-
-				ok, err := ssha512.Validate("foobar", s)
-				if err != nil {
-					return fmt.Errorf("can't validate: %w", err)
-				}
-
-				if !ok {
-					return fmt.Errorf("hash mismatch")
-				}
-
-				return nil
-			},
-		},
-		{
-			Template: "{{.Content | ssha512 \"-12\" \"invalid\"}}",
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			OutputFunc: func(s string) error {
-				if !strings.HasPrefix(s, "{SSHA512}") {
-					return fmt.Errorf("wrong prefix: %s", s)
-				}
-
-				ok, err := ssha512.Validate("foobar", s)
-				if err != nil {
-					return fmt.Errorf("can't validate: %w", err)
-				}
-
-				if !ok {
-					return fmt.Errorf("hash mismatch")
-				}
-
-				return nil
-			},
-		},
-		{
-			Template: "{{.Content | md5crypt \"7\"}}",
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			OutputFunc: func(s string) error {
-				if !strings.HasPrefix(s, "{MD5-CRYPT}") {
-					return fmt.Errorf("wrong prefix: %s", s)
-				}
-
-				ok, err := md5crypt.Validate("foobar", s)
-				if err != nil {
-					return fmt.Errorf("can't validate: %w", err)
-				}
-
-				if !ok {
-					return fmt.Errorf("hash mismatch")
-				}
-
-				return nil
-			},
-		},
-		{
-			Template: "{{.Content | md5crypt \"0\"}}",
-			Name:     "testdir",
-			Content:  []byte("foobar"),
-			OutputFunc: func(s string) error {
-				if !strings.HasPrefix(s, "{MD5-CRYPT}") {
-					return fmt.Errorf("wrong prefix: %s", s)
-				}
-
-				ok, err := md5crypt.Validate("foobar", s)
-				if err != nil {
-					return fmt.Errorf("can't validate: %w", err)
-				}
-
-				if !ok {
-					return fmt.Errorf("hash mismatch")
-				}
-
-				return nil
-			},
 		},
 		{
 			Template: "{{.Content | argon2i \"64\"}}",

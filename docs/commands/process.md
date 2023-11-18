@@ -46,16 +46,9 @@ password=hunter2
 
 Function | Example | Description
 -------- | ------- | -----------
-`md5sum` | `{{ getpw "foo/bar" \| md5sum }}` | Calculate the hex md5sum of the input.
-`sha1sum` | `{{ getpw "foo/bar" \| sha1sum }}` | Calculate the hex sha1sum of the input.
-`md5crypt` | `{{ getpw "foo/bar" \| md5crypt }}` | Calculate the md5crypt of the input.
-`ssha` | `{{ getpw "foo/bar" \| ssha }}` | Calculate the salted SHA-1 of the input.
-`ssha256` | `{{ getpw "foo/bar" \| ssha256 }}` | Calculate the salted SHA-256 of the input.
-`ssha512` | `{{ getpw "foo/bar" \| ssha512 }}` | Calculate the salted SHA-512 of the input.
 `get` | `{{ get "foo/bar" }}` | Insert the full secret.
 `getpw` | `{{ getpw "foo/bar" }}` | Insert the value of the password field from the given secret.
 `getval` | `{{ getval "foo/bar" "baz" }}` | Insert the value of the named field from the given secret.
 `argon2i` | `{{ getpw "foo/bar" \| argon2i }}` | Calculate the Argon2i hash of the input.
 `argon2id` | `{{ getpw "foo/bar" \| argon2id }}` | Calculate the Argon2id hash of the input.
-`bcrypt` | `{{ getpw "foo/bar" \| bcrypt }}` | Calculate the Bcrypt hash of the input.
 `blake3` | `{{ getpw "foo/bar" \| blake3 }}` | Calculate the BLAKE-3 hash of the input.

@@ -29,7 +29,7 @@ None.
 
 ```text
 Password: {{ .Content }}
-SSHA256: {{ .Content | ssha256 }}
+BLAKE3: {{ .Content | blake3 }}
 ```
 
 ### Compute the SQL statements to create a new PostgreSQL user
@@ -47,12 +47,6 @@ sql:  |
 
 Function | Example | Description
 -------- | ------- | -----------
-`md5sum` | `{{ .Content \| md5sum }}` | Calculate the hex md5sum of the input.
-`sha1sum` | `{{ .Content \| sha1sum }}` | Calculate the hex sha1sum of the input.
-`md5crypt` | `{{ .Content \| md5crypt }}` | Calculate the md5crypt of the input.
-`ssha` | `{{ .Content \| ssha }}` | Calculate the salted SHA-1 of the input.
-`ssha256` | `{{ .Content \| ssha256 }}` | Calculate the salted SHA-256 of the input.
-`ssha512` | `{{ .Content \| ssha512 }}` | Calculate the salted SHA-512 of the input.
 `get` | `{{ get "foo/bar" }}` | Insert the full secret.
 `getpw` | `{{ getpw "foo/bar" }}` | Insert the value of the password field from the given secret.
 `getval` | `{{ getval "foo/bar" "baz" }}` | Insert the value of the named field from the given secret.

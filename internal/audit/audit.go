@@ -10,11 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gopasspw/gopass-hibp/pkg/hibp/api"
+	//"github.com/gopasspw/gopass-hibp/pkg/hibp/api"
 	"github.com/gopasspw/gopass-hibp/pkg/hibp/dump"
 	"github.com/gopasspw/gopass/internal/backend"
 	"github.com/gopasspw/gopass/internal/config"
-	"github.com/gopasspw/gopass/internal/hashsum"
+	//"github.com/gopasspw/gopass/internal/hashsum"
 	"github.com/gopasspw/gopass/internal/out"
 	"github.com/gopasspw/gopass/pkg/ctxutil"
 	"github.com/gopasspw/gopass/pkg/debug"
@@ -97,29 +97,6 @@ func New(ctx context.Context, s secretGetter) *Auditor {
 				return nil
 			},
 		},
-	}
-
-	if config.Bool(ctx, "audit.hibp-use-api") {
-		a.v = append(a.v, validator{
-			Name:        "hibp",
-			Description: "Checks passwords against the HIBPv2 API. See https://haveibeenpwned.com/",
-			Validate: func(_ string, sec gopass.Secret) error {
-				if sec.Password() == "" {
-					return nil
-				}
-
-				numFound, err := api.Lookup(hashsum.SHA1Hex(sec.Password()))
-				if err != nil {
-					return fmt.Errorf("can't check HIBPv2 API: %w", err)
-				}
-
-				if numFound > 0 {
-					return fmt.Errorf("password contained in at least %d public data breaches (HIBP API)", numFound)
-				}
-
-				return nil
-			},
-		})
 	}
 
 	return a

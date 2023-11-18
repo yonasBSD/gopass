@@ -57,15 +57,10 @@ func (r *ReportBuilder) AddPassword(name, pw string) {
 	r.Lock()
 	defer r.Unlock()
 
-	s256 := hashsum.SHA256Hex(pw)
-	d := r.duplicates[s256]
+	blake := hashsum.Blake3Hex(pw)
+	d := r.duplicates[blake]
 	d.Add(name)
-	r.duplicates[s256] = d
-
-	s1 := hashsum.SHA1Hex(pw)
-	s := r.sha1sums[s1]
-	s.Add(name)
-	r.sha1sums[s1] = s
+	r.duplicates[blake] = d
 }
 
 func (r *ReportBuilder) AddFinding(secret, finding, message, severity string) {
